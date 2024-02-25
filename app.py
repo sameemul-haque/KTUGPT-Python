@@ -1,15 +1,10 @@
-import os
-import faiss
-import pickle
-import textwrap
-from pprint import  pprint
+import os, textwrap
+from pprint import pprint
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
-from InstructorEmbedding import INSTRUCTOR
 from langchain_community.vectorstores import FAISS
 from langchain_community.llms import HuggingFaceHub
 from langchain_community.document_loaders import PyPDFLoader
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from langchain_community.document_loaders import DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceInstructEmbeddings
@@ -26,22 +21,7 @@ def main():
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     texts = text_splitter.split_documents(documents)
 
-    # store the embeddings
-    # def store_embeddings(docs, embeddings, sotre_name, path):
-    #     vectorStore = FAISS.from_documents(docs, embeddings)
-    #     with open(f"{path}/faiss_{sotre_name}.pkl", "wb") as f:
-    #         pickle.dump(vectorStore, f)
-
-    # def load_embeddings(sotre_name, path):
-    #     with open(f"{path}/faiss_{sotre_name}.pkl", "rb") as f:
-    #         VectorStore = pickle.load(f)
-    #     return VectorStore
-
     instructor_embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
-    Embedding_store_path = f"./Embedding_store"
-
-    # store_embeddings(texts, instructor_embeddings, sotre_name='instructEmbeddings', path=Embedding_store_path)
-    # db_instructEmbedd = load_embeddings(sotre_name='instructEmbeddings', path=Embedding_store_path)
 
     # create the retriever
     db_instructEmbedd = FAISS.from_documents(texts, instructor_embeddings)

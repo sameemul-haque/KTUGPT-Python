@@ -1,0 +1,10 @@
+Flask==3.0.2
+Gunicorn
+python-dotenv==1.0.1
+langchain==0.1.6
+pypdf==4.0.1
+InstructorEmbedding==1.0.1
+torch==2.2.1
+tqdm==4.66.2
+sentence-transformers==2.2.2
+faiss-cpu==1.7.4

@@ -1,5 +1,4 @@
 import os, textwrap
-from pprint import pprint
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
@@ -34,16 +33,9 @@ def main():
     # create the retriever
     db_instructEmbedd = FAISS.from_documents(texts, instructor_embeddings)
     retriever = db_instructEmbedd.as_retriever(search_kwargs={"k": 3})
-    # print("this is the embeddings----------:",db_instructEmbedd,"----------embeddings")
-    # print("this is the retriever----------:",retriever,"----------retriever")
-    # db.save_local("faiss_index")
+    # retriever search type is similarity search
+    
     # query = 'What is operating system?'
-    # print('retriever search type:',retriever.search_type)  # retriever search type is similarity search
-    # print('retriever search kwargs:',retriever.search_kwargs)
-    # docs = retriever.get_relevant_documents(query)
-    # pprint(docs[0])
-    # pprint(docs[1])
-    # pprint(docs[2])
 
     # Initialize the model  falcon-7b
     os.environ["HUGGINGFACEHUB_API_TOKEN"]
@@ -52,7 +44,6 @@ def main():
     # create the chain to answer questions 
     qa_chain_instrucEmbed = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
 
-    ## Cite sources
     def wrap_text_preserve_newlines(text, width=110):
         # Split the input text into lines based on newline characters
         lines = text.split('\n')
@@ -61,18 +52,17 @@ def main():
         # Join the wrapped lines back together using newline characters
         wrapped_text = '\n'.join(wrapped_lines)
         return wrapped_text
-    # def process_llm_response(llm_response):
-        # print(wrap_text_preserve_newlines(llm_response['result']))
-        # print('\nSources:')
-        # for source in llm_response["source_documents"]:
-        #     print(source.metadata['source'])
 
     llm_response = qa_chain_instrucEmbed(query)
     res = wrap_text_preserve_newlines(llm_response['result'])
-    # process_llm_response(llm_response)
-    return res
+    # print(res)
 
-    #print(res,"result")
+    index_helpful_answer = res.find("Helpful Answer:")
+    if index_helpful_answer != -1:  
+        helpful_answer_text = res[index_helpful_answer + len("Helpful Answer:"):]
+        return(helpful_answer_text.strip())
+    else:
+        return("Error")
 
 if __name__ == '__main__':
     main()

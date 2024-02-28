@@ -8,8 +8,16 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceInstructEmbeddings
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route('/',methods=['GET'])
 
 def main():
+    query = request.args.get('q')
+    # query = unquote(query)
+
     # load env
     load_dotenv()
 
@@ -26,7 +34,10 @@ def main():
     # create the retriever
     db_instructEmbedd = FAISS.from_documents(texts, instructor_embeddings)
     retriever = db_instructEmbedd.as_retriever(search_kwargs={"k": 3})
-    query = 'What is operating system?'
+    # print("this is the embeddings----------:",db_instructEmbedd,"----------embeddings")
+    # print("this is the retriever----------:",retriever,"----------retriever")
+    # db.save_local("faiss_index")
+    # query = 'What is operating system?'
     # print('retriever search type:',retriever.search_type)  # retriever search type is similarity search
     # print('retriever search kwargs:',retriever.search_kwargs)
     # docs = retriever.get_relevant_documents(query)
@@ -50,15 +61,18 @@ def main():
         # Join the wrapped lines back together using newline characters
         wrapped_text = '\n'.join(wrapped_lines)
         return wrapped_text
-
-    def process_llm_response(llm_response):
-        print(wrap_text_preserve_newlines(llm_response['result']))
-        print('\nSources:')
-        for source in llm_response["source_documents"]:
-            print(source.metadata['source'])
+    # def process_llm_response(llm_response):
+        # print(wrap_text_preserve_newlines(llm_response['result']))
+        # print('\nSources:')
+        # for source in llm_response["source_documents"]:
+        #     print(source.metadata['source'])
 
     llm_response = qa_chain_instrucEmbed(query)
-    process_llm_response(llm_response)
+    res = wrap_text_preserve_newlines(llm_response['result'])
+    # process_llm_response(llm_response)
+    return res
+
+    #print(res,"result")
 
 if __name__ == '__main__':
     main()

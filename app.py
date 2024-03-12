@@ -1,3 +1,4 @@
+import pymongo
 import os, textwrap
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
@@ -6,6 +7,7 @@ from langchain_community.llms import HuggingFaceHub
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import MongoDBAtlasVectorSearch
 from langchain_community.embeddings import HuggingFaceInstructEmbeddings
 from flask import Flask, request
 
@@ -14,31 +16,56 @@ app = Flask(__name__)
 @app.route('/',methods=['GET'])
 
 def main():
+    # load env
+    load_dotenv()
+    mongodb_connection_string = os.getenv("MONGODB_CONNECTION_STRING")
+    os.environ["HUGGINGFACEHUB_API_TOKEN"]
+
+    # connect to mongodb
+    client = pymongo.MongoClient(mongodb_connection_string)
+    db = client.test_database
+    collection = db.textbooks
+
     query = request.args.get('q')
     # query = unquote(query)
 
-    # load env
-    load_dotenv()
-
     # load pdfs from the Documents directory
-    loader = DirectoryLoader(f'./Documents/', glob="./*.pdf", loader_cls=PyPDFLoader)
-    documents = loader.load()
+    # loader = DirectoryLoader(f'./Documents/', glob="./*.pdf", loader_cls=PyPDFLoader)
+    # documents = loader.load()
 
     # split the documents into chunks
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    texts = text_splitter.split_documents(documents)
+    # text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    # texts = text_splitter.split_documents(documents)
 
     instructor_embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
 
     # create the retriever
-    db_instructEmbedd = FAISS.from_documents(texts, instructor_embeddings)
-    retriever = db_instructEmbedd.as_retriever(search_kwargs={"k": 3})
+    # db_instructEmbedd = FAISS.from_documents(texts, instructor_embeddings)
+    # retriever = db_instructEmbedd.as_retriever(search_kwargs={"k": 3})
     # retriever search type is similarity search
+
+    # # create the retriever and do embedding
+    # vector_search = MongoDBAtlasVectorSearch.from_documents(
+    #     documents=texts,
+    #     embedding=instructor_embeddings,
+    #     collection=collection,
+    #     index_name="default",
+    # )
+
+    vector_search = MongoDBAtlasVectorSearch.from_connection_string(
+        mongodb_connection_string,
+        "test_database" + "." + "textbooks",
+        instructor_embeddings,
+        index_name="default",
+    )
+    retriever = vector_search.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 3},
+    )
     
     # query = 'What is operating system?'
 
     # Initialize the model  falcon-7b
-    os.environ["HUGGINGFACEHUB_API_TOKEN"]
     llm=HuggingFaceHub(repo_id="tiiuae/falcon-7b-instruct", model_kwargs={"temperature":0.1 ,"max_length":512})
 
     # create the chain to answer questions 

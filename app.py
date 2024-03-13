@@ -29,6 +29,8 @@ def main():
     query = request.args.get('q')
     # query = unquote(query)
 
+    # query = 'What is the price of iphone 13?'
+
     # load pdfs from the Documents directory
     # loader = DirectoryLoader(f'./Documents/', glob="./*.pdf", loader_cls=PyPDFLoader)
     # documents = loader.load()
@@ -63,10 +65,9 @@ def main():
         search_kwargs={"k": 3},
     )
     
-    # query = 'What is operating system?'
 
-    # Initialize the model  falcon-7b
-    llm=HuggingFaceHub(repo_id="tiiuae/falcon-7b-instruct", model_kwargs={"temperature":0.1 ,"max_length":512})
+    # Initialize the model 
+    llm=HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kwargs={"temperature":0.1 ,"max_length":512})
 
     # create the chain to answer questions 
     qa_chain_instrucEmbed = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)

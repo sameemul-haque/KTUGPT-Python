@@ -1,6 +1,6 @@
 # KTUGPT-Python
 
-A Flask web application that is designed for answering questions based on the context from the PDFs. It uses the [tiiuae/falcon-7b-instruct](https://huggingface.co/tiiuae/falcon-7b-instruct) model as the large language model (LLM) and the [hkunlp/instructor-xl](https://huggingface.co/hkunlp/instructor-xl) model for embedding text representations.
+A Flask web application that is designed for answering questions based on the context from the PDFs. It uses the [mistralai/Mixtral-8x7B-Instruct-v0.1](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1) model as the large language model (LLM) and the [hkunlp/instructor-xl](https://huggingface.co/hkunlp/instructor-xl) model for embedding text representations.
 
 
 ## Setup

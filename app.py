@@ -2,6 +2,7 @@ import pymongo
 import os, textwrap
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
+from langchain.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
 from langchain_community.llms import HuggingFaceHub
 from langchain_community.document_loaders import PyPDFLoader
@@ -68,9 +69,20 @@ def main():
 
     # Initialize the model 
     llm=HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kwargs={"temperature":0.1 ,"max_length":512})
+    
+    # prompt template
+    prompt_template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+    {context}
+
+    Question: {question}
+    """
+    PROMPT = PromptTemplate(
+        template=prompt_template, input_variables=["context", "question"]
+    )
 
     # create the chain to answer questions 
-    qa_chain_instrucEmbed = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
+    qa_chain_instrucEmbed = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True, chain_type_kwargs={"prompt": PROMPT})
 
     def wrap_text_preserve_newlines(text, width=110):
         # Split the input text into lines based on newline characters
@@ -83,11 +95,11 @@ def main():
 
     llm_response = qa_chain_instrucEmbed(query)
     res = wrap_text_preserve_newlines(llm_response['result'])
-    # print(res)
+    print(res)
 
-    index_helpful_answer = res.find("Helpful Answer:")
+    index_helpful_answer = res.find("Answer:")
     if index_helpful_answer != -1:  
-        helpful_answer_text = res[index_helpful_answer + len("Helpful Answer:"):]
+        helpful_answer_text = res[index_helpful_answer + len("Answer:"):]
         return(helpful_answer_text.strip())
     else:
         return("Error")

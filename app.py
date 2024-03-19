@@ -14,7 +14,7 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-@app.route('/',methods=['GET'])
+@app.route('/',methods=['POST'])
 
 def main():
     # load env
@@ -29,7 +29,7 @@ def main():
 
     query = request.args.get('q')
     # query = unquote(query)
-
+    print("==================== query is -",query,"====================")
     # query = 'What is the price of iphone 13?'
 
     # load pdfs from the Documents directory

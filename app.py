@@ -95,12 +95,13 @@ def main():
 
     llm_response = qa_chain_instrucEmbed(query)
     res = wrap_text_preserve_newlines(llm_response['result'])
+    source = [[item.metadata.get('source')[10:-4], item.metadata.get('page')] for item in llm_response['source_documents']]
     print(res)
 
     index_helpful_answer = res.find("Answer:")
     if index_helpful_answer != -1:  
         helpful_answer_text = res[index_helpful_answer + len("Answer:"):]
-        return(helpful_answer_text.strip())
+        return({"result": helpful_answer_text.strip(), "source": source})
     else:
         return("Error")
 

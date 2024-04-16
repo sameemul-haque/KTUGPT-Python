@@ -98,7 +98,7 @@ def main():
 
     llm_response = qa_chain_instrucEmbed(query)
     res = wrap_text_preserve_newlines(llm_response['result'])
-    source = [[item.metadata.get('source')[10:-4], item.metadata.get('page')] for item in llm_response['source_documents']]
+    source = [[item.metadata.get('source')[10:-4], item.metadata.get('page')+1] for item in llm_response['source_documents']]
     print(res)
 
     index_helpful_answer = res.find("Answer:")

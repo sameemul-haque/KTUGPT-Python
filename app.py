@@ -11,9 +11,15 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import MongoDBAtlasVectorSearch
 from langchain_community.embeddings import HuggingFaceInstructEmbeddings
 from flask import Flask, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
+# Initialize the models 
+instructor_embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+llm=HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kwargs={"temperature":0.1 ,"max_length":512})
+ 
 @app.route('/',methods=['POST'])
 
 def main():
@@ -40,7 +46,6 @@ def main():
     # text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     # texts = text_splitter.split_documents(documents)
 
-    instructor_embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
 
     # create the retriever
     # db_instructEmbedd = FAISS.from_documents(texts, instructor_embeddings)
@@ -67,9 +72,7 @@ def main():
     )
     
 
-    # Initialize the model 
-    llm=HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kwargs={"temperature":0.1 ,"max_length":512})
-    
+   
     # prompt template
     prompt_template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
 

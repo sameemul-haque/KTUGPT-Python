@@ -104,7 +104,7 @@ def main():
     index_helpful_answer = res.find("Answer:")
     if index_helpful_answer != -1:  
         helpful_answer_text = res[index_helpful_answer + len("Answer:"):]
-        return({"result": helpful_answer_text.strip(), "source": source})
+        return({"result": helpful_answer_text.strip().replace("\n"," "), "source": source})
     else:
         return("Error")
 

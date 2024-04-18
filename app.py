@@ -64,7 +64,7 @@ def main():
         mongodb_connection_string,
         "database" + "." + "textbooks",
         instructor_embeddings,
-        index_name="default",
+        index_name="search",
     )
     retriever = vector_search.as_retriever(
         search_type="similarity",

@@ -1,6 +1,4 @@
 Flask
-Gunicorn
-python-dotenv
 langchain==0.1.16
 langchain-community==0.0.34
 langchain-core==0.1.46

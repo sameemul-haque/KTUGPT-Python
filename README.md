@@ -8,12 +8,12 @@ A Flask web application that is designed for answering questions based on the co
 - Clone this repository:
 
    ```
-   git clone https://github.com/sameemul-haque/ktugpt-python.git
+   git clone https://github.com/sameemul-haque/KTUGPT-Python.git
    ```
-- After cloning the repository, navigate into the ktugpt-python directory
+- After cloning the repository, navigate into the `KTUGPT-Python` directory
 
    ```
-   cd ktugpt-python
+   cd KTUGPT-Python
    ```
 
 - Set up a Python virtual environment:
@@ -41,10 +41,10 @@ A Flask web application that is designed for answering questions based on the co
 
 6. Create a `.env` file based on `.env.example` and add your [Hugging Face API token](https://huggingface.co/docs/hub/en/security-tokens) and [MongoDB Connection String](https://www.mongodb.com/docs/manual/reference/connection-string/)
 
-- Run the Flask web app:
+- Run the app:
 
    ```
-   flask --app app run --host=0.0.0.0
+   python app.py 
    ```
 
 ## Usage

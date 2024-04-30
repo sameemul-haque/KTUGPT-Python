@@ -1,6 +1,5 @@
 import pymongo
 import os, textwrap
-from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
@@ -16,6 +15,12 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# load env
+mongodb_connection_string = os.getenv("MONGODB_CONNECTION_STRING")
+HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+# print("mongodb_connection_string", mongodb_connection_string)
+# print("HUGGINGFACE  API TOKEN",HUGGINGFACEHUB_API_TOKEN)
+      
 # Initialize the models 
 instructor_embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
 llm=HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kwargs={"temperature":0.1 ,"max_length":512})
@@ -23,11 +28,6 @@ llm=HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kwargs={"
 @app.route('/',methods=['POST'])
 
 def main():
-    # load env
-    load_dotenv()
-    mongodb_connection_string = os.getenv("MONGODB_CONNECTION_STRING")
-    os.environ["HUGGINGFACEHUB_API_TOKEN"]
-
     # connect to mongodb
     client = pymongo.MongoClient(mongodb_connection_string)
     db = client.database
@@ -107,4 +107,4 @@ def main():
         return("Error")
 
 if __name__ == '__main__':
-    main()
+    app.run(host="0.0.0.0", port=7860)  

@@ -1,3 +1,15 @@
+---
+title: KTUGPT
+emoji: 📚
+colorFrom: blue
+colorTo: purple
+sdk: gradio
+sdk_version: 4.28.3
+app_file: app.py
+pinned: false
+license: mit
+---
+
 # KTUGPT-Python
 
 A Flask web application that is designed for answering questions based on the context from the PDFs. It uses the [mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1) model as the large language model (LLM) and the [hkunlp/instructor-xl](https://huggingface.co/hkunlp/instructor-xl) model for embedding text representations.

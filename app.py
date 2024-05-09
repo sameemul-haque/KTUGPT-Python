@@ -22,7 +22,7 @@ HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
    
 # Initialize the models 
 instructor_embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
-llm=HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kwargs={"temperature":0.1 ,"max_length":512})
+llm=HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.2", model_kwargs={"temperature":0.1 ,"max_length":512})
  
 @app.route('/',methods=['GET','POST'])
 
@@ -85,24 +85,26 @@ def main():
         # create the chain to answer questions 
         qa_chain_instrucEmbed = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True, chain_type_kwargs={"prompt": PROMPT})
 
-        def wrap_text_preserve_newlines(text, width=110):
-            # Split the input text into lines based on newline characters
-            lines = text.split('\n')
-            # Wrap each line individually
-            wrapped_lines = [textwrap.fill(line, width=width) for line in lines]
-            # Join the wrapped lines back together using newline characters
-            wrapped_text = '\n'.join(wrapped_lines)
-            return wrapped_text
+        # def wrap_text_preserve_newlines(text, width=110):
+        #     # Split the input text into lines based on newline characters
+        #     lines = text.split('\n')
+        #     # Wrap each line individually
+        #     wrapped_lines = [textwrap.fill(line, width=width) for line in lines]
+        #     # Join the wrapped lines back together using newline characters
+        #     wrapped_text = '\n'.join(wrapped_lines)
+        #     return wrapped_text
 
         llm_response = qa_chain_instrucEmbed(query)
-        res = wrap_text_preserve_newlines(llm_response['result'])
+        # res = wrap_text_preserve_newlines(llm_response['result'])
+        res = llm_response['result']
         source = [[item.metadata.get('source')[10:-4], item.metadata.get('page')+1] for item in llm_response['source_documents']]
         print(res)
 
         index_helpful_answer = res.find("Answer:")
         if index_helpful_answer != -1:  
             helpful_answer_text = res[index_helpful_answer + len("Answer:"):]
-            return({"result": helpful_answer_text.strip().replace("\n"," "), "source": source})
+            # helpful_answer_text.strip().replace("\n"," ")
+            return({"result": helpful_answer_text, "source": source if "I don't know" not in helpful_answer_text else []})
         else:
             return("Error")
     else:
